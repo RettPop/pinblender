@@ -14,13 +14,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const malfunctionDialog = document.getElementById('malfunctionDialog');
     const closeMalfunction = document.getElementById('closeMalfunction');
 
-    // Generate a string of random digits (0-9)
-    function generateRandomDigits(length) {
+    // Generate a string of random noise based on a character pool
+    function generateRandomNoise(length, pool) {
         let result = '';
         for (let i = 0; i < length; i++) {
-            result += Math.floor(Math.random() * 10).toString();
+            result += pool[Math.floor(Math.random() * pool.length)];
         }
         return result;
+    }
+
+    // Determine the "alphabet" pool based on the characters in the PIN
+    function getNoisePool(pin) {
+        const hasNonNumeric = /[^0-9]/.test(pin);
+        
+        if (hasNonNumeric) {
+            return '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        }
+        
+        return '0123456789';
     }
 
     // Core blending logic
@@ -32,17 +43,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!pin || isNaN(position) || position < 1) return;
 
+        const noisePool = getNoisePool(pin);
         let blendedOutput = '';
 
         for (let i = 0; i < pin.length; i++) {
-            blendedOutput += generateRandomDigits(position - 1);
+            blendedOutput += generateRandomNoise(position - 1, noisePool);
             blendedOutput += pin[i];
         }
 
         const minTrailing = position * 2;
         const maxTrailing = position * 4;
         const trailingLength = Math.floor(Math.random() * (maxTrailing - minTrailing + 1)) + minTrailing;
-        blendedOutput += generateRandomDigits(trailingLength);
+        blendedOutput += generateRandomNoise(trailingLength, noisePool);
 
         if (addUnsecureOffset) {
             blendedOutput = `${pin.length}@${position}x${blendedOutput}`;
