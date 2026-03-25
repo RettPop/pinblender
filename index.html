@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinBlender - The Clockwork Obfuscator</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts for Steampunk aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Metamorphous&family=Special+Elite&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <button id="helpButton" class="icon-button help-icon" title="Mechanism Instructions">
+            <span class="help-char">?</span>
+        </button>
+        <header>
+            <h1>PinBlender</h1>
+            <p class="subtitle">The Clockwork Obfuscator</p>
+        </header>
+
+        <main>
+            <section class="controls">
+                <div class="input-group">
+                    <label for="pinInput">Secret PIN</label>
+                    <input type="text" id="pinInput" placeholder="Enter PIN...">
+                </div>
+
+                <div class="input-group">
+                    <label for="positionInput">Position Offset (JUST REMEMBER IT)</label>
+                    <input type="number" id="positionInput" value="4" min="1" max="20">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="prefixCheckbox">
+                    <label for="prefixCheckbox">Add Length Prefix (e.g., 4x)</label>
+                </div>
+
+                <div class="checkbox-group unsecure">
+                    <input type="checkbox" id="offsetCheckbox">
+                    <label for="offsetCheckbox">Add offset to the output (UNSECURE! DO NOT DO IT)</label>
+                </div>
+
+                <button id="blendButton" class="steam-button">Engage Mechanism</button>
+                <button id="deobfuscateButton" class="steam-button">Extract Essence</button>
+            </section>
+
+            <section class="output-area">
+                <label for="outputResult" id="outputLabel">Obfuscated Output</label>
+                <div class="result-container">
+                    <textarea id="outputResult" readonly placeholder="Result will appear here..."></textarea>
+                    <button id="copyButton" class="icon-button" title="Copy to Clipboard">
+                        <span>📋</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 1895 Clockwork Security Solutions</p>
+            <p class="privacy-note">All processing occurs locally within your mechanical browser. No data is stored, tracked, or transmitted to any external steam-server.</p>
+        </footer>
+    </div>
+
+    <!-- Help Dialog -->
+    <dialog id="helpDialog">
+        <div class="dialog-content">
+            <h2>Mechanism Instructions</h2>
+            <div class="instruction-body">
+                <p>The <strong>PinBlender</strong> uses a precise clockwork offset to hide your secret code within a stream of noise.</p>
+                
+                <h3>1. The Position Offset</h3>
+                <p>Your PIN digits are placed at intervals defined by the <strong>Position Offset</strong>. For an offset of <code>4</code>, the mechanism generates <code>3</code> random digits, followed by your <code>1st</code> PIN digit, and so on.</p>
+                
+                <h3>2. Trailing Noise</h3>
+                <p>To mask the true length of your PIN, a random sequence of noise (between 2x and 4x the offset length) is appended at the very end.</p>
+                
+                <h3>3. Length Prefix</h3>
+                <p>If engaged, a prefix like <code>4x</code> is added to remind you that your original PIN was 4 digits long.</p>
+                
+                <h3>4. Unsecure Offset Exposure</h3>
+                <p class="warning-text"><strong>WARNING:</strong> This feature exposes both the PIN length and the Position Offset directly in the output (e.g., <code>4@3x123...</code>). This significantly reduces security and is strictly for mechanical testing only.</p>
+
+                <h3>5. Extracting the Essence</h3>
+                <p>Provide an obfuscated sequence to retrieve the original PIN. If the sequence contains a prefix (like <code>4x</code> or <code>4@3x</code>), the mechanism will automatically calibrate. Otherwise, ensure the <strong>Position Offset</strong> matches the one used during obfuscation.</p>
+
+                <div class="example">
+                    <strong>Example:</strong> PIN <code>1234</code>, Offset <code>3</code><br>
+                    <code>[XX]1[XX]2[XX]3[XX]4[XXXXXX...]</code>
+                </div>
+            </div>
+            <button id="closeHelp" class="steam-button">Return to Console</button>
+        </div>
+    </dialog>
+
+    <!-- Malfunction Dialog -->
+    <dialog id="malfunctionDialog">
+        <div class="dialog-content">
+            <h2 class="warning-text">⚙️ Mechanical Failure! ⚙️</h2>
+            <div class="instruction-body">
+                <p>The gears have ground to a halt! The provided sequence does not align with our clockwork logic.</p>
+                <p>Ensure your input follows a recognized obfuscation pattern or matches the current Position Offset.</p>
+            </div>
+            <button id="closeMalfunction" class="steam-button">Recalibrate</button>
+        </div>
+    </dialog>
+    <script src="script.js"></script>
+</body>
+</html>
