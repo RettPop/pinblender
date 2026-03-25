@@ -20,12 +20,6 @@ If you enter a PIN of `3579` and a Position of `4`:
 
 The result looks like a long, meaningless string of numbers to anyone but you!
 
-## Hosting on GitHub Pages
-1. Push this project to a new GitHub repository.
-2. Go to **Settings** > **Pages**.
-3. Under **Build and deployment**, select the `main` branch and `/ (root)` folder.
-4. Click **Save**. Your site will be live at `https://<your-username>.github.io/pinblender/`.
-
 ## Credits
 - Fonts: [Metamorphous](https://fonts.google.com/specimen/Metamorphous) and [Special Elite](https://fonts.google.com/specimen/Special+Elite) via Google Fonts.
 - Patterns: Parchment texture from [Transparent Textures](https://www.transparenttextures.com/).
