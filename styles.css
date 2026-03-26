@@ -22,7 +22,6 @@ body {
     font-family: 'Special Elite', 'Courier New', Courier, monospace;
     display: flex;
     justify-content: center;
-    align-items: center;
     min-height: 100vh;
     padding: 20px;
 }
@@ -37,6 +36,28 @@ body {
     padding: 40px;
     position: relative;
     overflow: hidden;
+    height: fit-content;
+}
+
+/* Modal Overlay System */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100%;
+    background: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: none; /* Toggled via JS */
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* Reuse container styles for modals */
+.help-container, .malfunction-container {
+    margin: 0 auto;
+    z-index: 1001;
 }
 
 /* Help Icon positioning & Steampunk Dial Styling */
@@ -53,14 +74,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 
-        2px 2px 8px var(--shadow),
-        inset 1px 1px 2px rgba(255,255,255,0.3);
+    box-shadow: 2px 2px 8px var(--shadow), inset 1px 1px 2px rgba(255,255,255,0.3);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* "Rivet" effect for the dial */
 .help-icon::before {
     content: '';
     position: absolute;
@@ -84,9 +102,7 @@ body {
 .help-icon:hover {
     transform: scale(1.1) rotate(15deg);
     background: radial-gradient(circle at 30% 30%, var(--copper), var(--dark-mahogany));
-    box-shadow: 
-        0 0 15px var(--brass),
-        2px 2px 8px var(--shadow);
+    box-shadow: 0 0 15px var(--brass), 2px 2px 8px var(--shadow);
 }
 
 /* Decorative Gears */
@@ -106,62 +122,11 @@ body {
     to { transform: rotate(360deg); }
 }
 
-/* Dialog Styling */
-dialog {
-    border: 8px double var(--brass);
-    background-color: var(--parchment);
-    background-image: url('https://www.transparenttextures.com/patterns/parchment.png');
-    padding: 30px;
-    max-width: 500px;
-    width: 90%;
-    height: auto;
-    margin: 40px auto;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 100px rgba(0,0,0,0.05);
-    position: relative;
-    outline: none;
-}
-
-
-dialog[open] {
-    display: flex;
-    flex-direction: column;
-}
-
-dialog::backdrop {
-    background: rgba(26, 26, 26, 0.85);
-    backdrop-filter: blur(4px);
-}
-
 .dialog-content {
     font-family: 'Special Elite', monospace;
     color: var(--ink);
     position: relative;
     z-index: 1;
-    padding: 30px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-}
-
-/* Decorative Gears for Dialog */
-.dialog-content::before, .dialog-content::after {
-    content: '⚙️';
-    position: absolute;
-    font-size: 80px;
-    opacity: 0.08;
-    z-index: -1;
-    animation: rotate 15s linear infinite;
-}
-
-.dialog-content::before {
-    top: -40px;
-    right: -40px;
-}
-
-.dialog-content::after {
-    bottom: -40px;
-    left: -40px;
-    animation-direction: reverse;
 }
 
 .dialog-content h2 {
@@ -169,6 +134,7 @@ dialog::backdrop {
     color: var(--dark-mahogany);
     text-align: center;
     margin-bottom: 20px;
+    outline: none;
 }
 
 .instruction-body h3 {
@@ -193,14 +159,9 @@ dialog::backdrop {
     font-size: 0.8rem;
 }
 
-#closeHelp {
+#closeHelp, #closeMalfunction {
     width: 100%;
     margin-top: 20px;
-}
-
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
 }
 
 header {
@@ -270,9 +231,9 @@ input:focus {
 
 .checkbox-group {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 10px;
-    cursor: pointer;
 }
 
 .checkbox-group label {

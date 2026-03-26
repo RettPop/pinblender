@@ -43,5 +43,6 @@ Since this is a single-page application (HTML/CSS/JS), it is perfect for **GitHu
 *   No external libraries or dependencies are required (all assets are linked via CDN or embedded).
 
 ---
-*Created for the discerning engineer of the late 19th century. (v.1.1.3)*
+*Created for the discerning engineer of the late 19th century. (v.1.1.9)*
+
 

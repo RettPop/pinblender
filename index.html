@@ -12,7 +12,8 @@
 </head>
 
 <body>
-    <div class="container">
+    <!-- Main Application Console -->
+    <div id="appContainer" class="container">
         <button id="helpButton" class="icon-button help-icon" title="Mechanism Instructions">
             <span class="help-char">?</span>
         </button>
@@ -45,7 +46,7 @@
 
                 <div class="checkbox-group unsecure">
                     <input type="checkbox" id="offsetCheckbox">
-                    <label for="offsetCheckbox">Add offset to the output (UNSECURE! DO NOT DO IT)</label>
+                    <label for="offsetCheckbox">Add offset and lag to the output<br>(UNSECURE! DO NOT DO IT)</label>
                 </div>
 
                 <button id="blendButton" class="steam-button">Engage Mechanism</button>
@@ -67,67 +68,81 @@
             <p>&copy; 1895 Clockwork Security Solutions</p>
             <p class="privacy-note">All processing occurs locally within your mechanical browser. No data is stored,
                 tracked, or transmitted to any external steam-server.</p>
-            <p class="privacy-note">v.1.1.3</p>
-
+            <p class="privacy-note">v.1.1.9</p>
         </footer>
     </div>
 
-    <!-- Help Dialog -->
-    <dialog id="helpDialog">
-        <div class="dialog-content">
-            <h2 tabindex="-1">Mechanism Instructions</h2>
-            <div class="instruction-body">
-                <p>The <strong>PinBlender</strong> uses a precise clockwork offset to hide your secret code within a
-                    stream of noise.</p>
+    <!-- Help Modal Overlay -->
+    <div id="helpModal" class="modal-overlay" style="display:none">
+        <div class="container help-container">
+            <div class="dialog-content">
+                <h2 tabindex="-1">Mechanism Instructions</h2>
+                <div class="instruction-body">
+                    <p>The <strong>PinBlender</strong> uses a precise clockwork offset to hide your secret code within a
+                        stream of noise.</p>
 
-                <h3>1. The Initial Gear Lag</h3>
-                <p>To thwart brute-force attempts, the mechanism can prepend a random sequence of noise called <strong>Initial Gear Lag</strong>. This shifts the entire sequence, making the starting point of your PIN unpredictable.</p>
+                    <h3>1. The Initial Gear Lag</h3>
+                    <p>To thwart brute-force attempts, the mechanism can prepend a random sequence of noise called
+                        <strong>Initial Gear Lag</strong>. This shifts the entire sequence, making the starting point of
+                        your PIN unpredictable.
+                    </p>
 
-                <h3>2. The Position Offset</h3>
-                <p>Your PIN digits are placed at intervals defined by the <strong>Position Offset</strong>. For an
-                    offset of <code>4</code>, the mechanism generates <code>3</code> random digits, followed by your
-                    <code>1st</code> PIN digit, and so on.
-                </p>
+                    <h3>2. The Position Offset</h3>
+                    <p>Your PIN digits are placed at intervals defined by the <strong>Position Offset</strong>. For an
+                        offset of <code>4</code>, the mechanism generates <code>3</code> random digits, followed by your
+                        <code>1st</code> PIN digit, and so on.
+                    </p>
 
-                <h3>3. Trailing Noise</h3>
-                <p>To mask the true length of your PIN, a random sequence of noise is appended at the very end.</p>
+                    <h3>3. Trailing Noise</h3>
+                    <p>To mask the true length of your PIN, a random sequence of noise is appended at the very end.</p>
 
-                <h3>4. Length Prefix</h3>
-                <p>If engaged, a prefix like <code>4x</code> is added to remind you that your original PIN was 4 digits
-                    long.</p>
+                    <h3>4. Length Prefix</h3>
+                    <p>If engaged, a prefix like <code>4x</code> is added to remind you that your original PIN was 4
+                        digits
+                        long.</p>
 
-                <h3>5. Unsecure Offset Exposure</h3>
-                <p class="warning-text"><strong>WARNING:</strong> This feature exposes the PIN length, the
-                    Position Offset, and the Gear Lag directly in the output (e.g., <code>4@3:5x...</code>). This significantly reduces
-                    security and is strictly for mechanical testing only.</p>
+                    <h3>5. Unsecure Offset Exposure</h3>
+                    <p class="warning-text"><strong>WARNING:</strong> This feature exposes the PIN length, the
+                        Position Offset, and the Gear Lag directly in the output (e.g., <code>4@3:5x...</code>). This
+                        significantly reduces
+                        security and is strictly for mechanical testing only.</p>
 
-                <h3>6. Extracting the Essence</h3>
-                <p>Provide an obfuscated sequence to retrieve the original PIN. If the sequence contains a prefix (like
-                    <code>4x</code> or <code>4@3:5x</code>), the mechanism will automatically calibrate. Otherwise, ensure
-                    both <strong>Position Offset</strong> and <strong>Initial Gear Lag</strong> match the ones used during obfuscation.
-                </p>
+                    <h3>6. Extracting the Essence</h3>
+                    <p>Provide an obfuscated sequence to retrieve the original PIN. If the sequence contains a prefix
+                        (like
+                        <code>4x</code> or <code>4@3:5x</code>), the mechanism will automatically calibrate. Otherwise,
+                        ensure
+                        both <strong>Position Offset</strong> and <strong>Initial Gear Lag</strong> match the ones used
+                        during obfuscation.
+                    </p>
 
-                <div class="example">
-                    <strong>Example:</strong> PIN <code>1234</code>, Offset <code>3</code><br>
-                    <code>[XX]1[XX]2[XX]3[XX]4[XXXXXX...]</code>
+                    <div class="example">
+                        <strong>Example:</strong> PIN <code>1234</code>, Offset <code>3</code><br>
+                        <code>[XX]1[XX]2[XX]3[XX]4[XXXXXX...]</code>
+                    </div>
                 </div>
+                <button id="closeHelp" class="steam-button">Return to Console</button>
             </div>
-            <button id="closeHelp" class="steam-button">Return to Console</button>
         </div>
-    </dialog>
+    </div>
 
-    <!-- Malfunction Dialog -->
-    <dialog id="malfunctionDialog">
-        <div class="dialog-content">
-            <h2 class="warning-text" tabindex="-1">⚙️ Mechanical Failure! ⚙️</h2>
-            <div class="instruction-body">
-                <p>The gears have ground to a halt! The provided sequence does not align with our clockwork logic.</p>
-                <p>Ensure your input follows a recognized obfuscation pattern or matches the current Position Offset.
-                </p>
+    <!-- Malfunction Modal Overlay -->
+    <div id="malfunctionModal" class="modal-overlay" style="display:none">
+        <div class="container malfunction-container">
+            <div class="dialog-content">
+                <h2 class="warning-text" tabindex="-1">⚙️ Mechanical Failure! ⚙️</h2>
+                <div class="instruction-body">
+                    <p>The gears have ground to a halt! The provided sequence does not align with our clockwork logic.
+                    </p>
+                    <p>Ensure your input follows a recognized obfuscation pattern or matches the current Position
+                        Offset.
+                    </p>
+                </div>
+                <button id="closeMalfunction" class="steam-button">Recalibrate</button>
             </div>
-            <button id="closeMalfunction" class="steam-button">Recalibrate</button>
         </div>
-    </dialog>
+    </div>
+
     <script src="script.js"></script>
 </body>
 

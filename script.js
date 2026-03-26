@@ -9,11 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const outputResult = document.getElementById('outputResult');
     const outputLabel = document.getElementById('outputLabel');
     const copyButton = document.getElementById('copyButton');
+    
     const helpButton = document.getElementById('helpButton');
-    const helpDialog = document.getElementById('helpDialog');
+    const helpModal = document.getElementById('helpModal');
     const closeHelp = document.getElementById('closeHelp');
-    const malfunctionDialog = document.getElementById('malfunctionDialog');
+    
+    const malfunctionModal = document.getElementById('malfunctionModal');
     const closeMalfunction = document.getElementById('closeMalfunction');
+    const appContainer = document.getElementById('appContainer');
 
     // Generate a string of random noise based on a character pool
     function generateRandomNoise(length, pool) {
@@ -82,9 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let lag = currentLag;
         let stream = input;
 
-        // Pattern 1: N@M:LxStream (Unsecure)
         const unsecureMatch = input.match(/^(\d+)@(\d+):(\d+)x(.+)$/);
-        // Pattern 2: NxStream (Prefix)
         const prefixMatch = input.match(/^(\d+)x(.+)$/);
 
         if (unsecureMatch) {
@@ -106,11 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let extracted = '';
         try {
-            let i = lag; // Start after the lag
+            let i = lag;
             let count = 0;
             while (i + offset - 1 < stream.length) {
                 if (pinLength !== null && count >= pinLength) break;
-                
                 extracted += stream[i + offset - 1];
                 i += offset;
                 count++;
@@ -139,40 +139,40 @@ document.addEventListener('DOMContentLoaded', () => {
         deobfuscateButton.disabled = !isPinNotEmpty || (!isSelfContained && (!isPositionValid || !isLagValid));
     }
 
-    // UI Event Listeners
-    pinInput.addEventListener('input', updateButtonStates);
-    positionInput.addEventListener('input', updateButtonStates);
-    lagInput.addEventListener('input', updateButtonStates);
-
-    blendButton.addEventListener('click', blendPin);
-    deobfuscateButton.addEventListener('click', extractPin);
-
     // Dialog Handlers
-    function openDialog(dialog) {
-        dialog.showModal();
-        const content = dialog.querySelector('.dialog-content');
-        if (content) content.scrollTop = 0;
-        const heading = dialog.querySelector('h2');
+    function openModal(modal) {
+        appContainer.style.display = 'none';
+        modal.style.display = 'flex';
+        window.scrollTo(0, 0);
+        const heading = modal.querySelector('h2');
         if (heading) heading.focus();
     }
 
-    helpButton.addEventListener('click', () => openDialog(helpDialog));
-    closeHelp.addEventListener('click', () => helpDialog.close());
-    closeMalfunction.addEventListener('click', () => malfunctionDialog.close());
-
-    function showMalfunction() {
-        openDialog(malfunctionDialog);
+    function closeModal(modal) {
+        modal.style.display = 'none';
+        appContainer.style.display = 'block';
+        window.scrollTo(0, 0);
     }
 
-    [helpDialog, malfunctionDialog].forEach(dialog => {
-        dialog.addEventListener('click', (e) => {
-            const rect = dialog.getBoundingClientRect();
-            if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
-                dialog.close();
+    helpButton.addEventListener('click', () => openModal(helpModal));
+    closeHelp.addEventListener('click', () => closeModal(helpModal));
+    
+    closeMalfunction.addEventListener('click', () => closeModal(malfunctionModal));
+
+    function showMalfunction() {
+        openModal(malfunctionModal);
+    }
+
+    // Modal background click to close
+    [helpModal, malfunctionModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(modal);
             }
         });
     });
 
+    // Copy logic
     copyButton.addEventListener('click', () => {
         if (!outputResult.value) return;
         outputResult.select();
@@ -181,6 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
         copyButton.innerHTML = '<span>✅</span>';
         setTimeout(() => copyButton.innerHTML = originalIcon, 2000);
     });
+
+    // Event Listeners for inputs
+    pinInput.addEventListener('input', updateButtonStates);
+    positionInput.addEventListener('input', updateButtonStates);
+    lagInput.addEventListener('input', updateButtonStates);
+
+    blendButton.addEventListener('click', blendPin);
+    deobfuscateButton.addEventListener('click', extractPin);
 
     updateButtonStates();
 });
