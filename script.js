@@ -25,9 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Determine the "alphabet" pool based on the characters in the PIN
     function getNoisePool(pin) {
+        // Look for any character that isn't a digit 0-9
         const hasNonNumeric = /[^0-9]/.test(pin);
         
         if (hasNonNumeric) {
+            // Mixed pool with high letter distribution to ensure they appear
             return '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         }
         
@@ -95,17 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (isNaN(offset) || offset < 1) {
-            malfunctionDialog.showModal();
+            showMalfunction();
             return;
         }
 
-        // Explicitly ensure pinInput is not readonly (though it shouldn't be)
+        // Explicitly ensure pinInput is not readonly
         pinInput.readOnly = false;
 
         let extracted = '';
         try {
-            // If pinLength is known, extract exactly that many
-            // If not, we extract based on the offset until the stream is exhausted
             let i = 0;
             let count = 0;
             while (i + offset - 1 < stream.length) {
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             outputLabel.innerText = 'Extracted Essence';
             outputResult.value = extracted;
         } catch (e) {
-            malfunctionDialog.showModal();
+            showMalfunction();
         }
     }
 
@@ -130,12 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isPositionValid = !isNaN(positionValue) && positionValue >= 1;
         const isPinNotEmpty = pinValue !== '';
 
-        // Engage requires both
         blendButton.disabled = !(isPinNotEmpty && isPositionValid);
-
-        // Extract Essence logic:
-        // 1. If it matches N@Mx... or Nx..., it's active
-        // 2. If it's a raw string, it requires a valid position offset
         const isSelfContained = /^(\d+)@(\d+)x/.test(pinValue) || /^(\d+)x/.test(pinValue);
         deobfuscateButton.disabled = !isPinNotEmpty || (!isSelfContained && !isPositionValid);
     }
@@ -148,9 +143,21 @@ document.addEventListener('DOMContentLoaded', () => {
     deobfuscateButton.addEventListener('click', extractPin);
 
     // Dialog Handlers
-    helpButton.addEventListener('click', () => helpDialog.showModal());
+    function openDialog(dialog) {
+        dialog.showModal();
+        dialog.scrollTop = 0;
+        // Focus the heading to prevent scrolling to the bottom button
+        const heading = dialog.querySelector('h2');
+        if (heading) heading.focus();
+    }
+
+    helpButton.addEventListener('click', () => openDialog(helpDialog));
     closeHelp.addEventListener('click', () => helpDialog.close());
     closeMalfunction.addEventListener('click', () => malfunctionDialog.close());
+
+    function showMalfunction() {
+        openDialog(malfunctionDialog);
+    }
 
     [helpDialog, malfunctionDialog].forEach(dialog => {
         dialog.addEventListener('click', (e) => {
