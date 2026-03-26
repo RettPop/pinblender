@@ -150,7 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dialog Handlers
     function openDialog(dialog) {
         dialog.showModal();
-        dialog.scrollTop = 0;
+        const content = dialog.querySelector('.dialog-content');
+        if (content) content.scrollTop = 0;
         const heading = dialog.querySelector('h2');
         if (heading) heading.focus();
     }

@@ -111,16 +111,21 @@ dialog {
     border: 8px double var(--brass);
     background-color: var(--parchment);
     background-image: url('https://www.transparenttextures.com/patterns/parchment.png');
-    padding: 30px;
+    padding: 0;
     max-width: 500px;
     width: 90%;
     max-height: 90vh;
     margin: auto;
     box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 100px rgba(0,0,0,0.05);
     position: relative;
-    overflow-y: auto;
+    overflow: hidden;
     overscroll-behavior: contain;
     outline: none;
+}
+
+dialog[open] {
+    display: flex;
+    flex-direction: column;
 }
 
 dialog::backdrop {
@@ -133,6 +138,10 @@ dialog::backdrop {
     color: var(--ink);
     position: relative;
     z-index: 1;
+    padding: 30px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 
 /* Decorative Gears for Dialog */
