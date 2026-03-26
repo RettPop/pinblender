@@ -115,12 +115,9 @@ dialog {
     max-width: 500px;
     width: 90%;
     height: auto;
-    max-height: calc(100vh - 40px);
-    margin: auto;
+    margin: 40px auto;
     box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 100px rgba(0,0,0,0.05);
     position: relative;
-    overflow-y: auto;
-    overscroll-behavior: contain;
     outline: none;
 }
 
