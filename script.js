@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const pinInput = document.getElementById('pinInput');
     const positionInput = document.getElementById('positionInput');
+    const lagInput = document.getElementById('lagInput');
     const prefixCheckbox = document.getElementById('prefixCheckbox');
     const offsetCheckbox = document.getElementById('offsetCheckbox');
     const blendButton = document.getElementById('blendButton');
@@ -25,14 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Determine the "alphabet" pool based on the characters in the PIN
     function getNoisePool(pin) {
-        // Look for any character that isn't a digit 0-9
         const hasNonNumeric = /[^0-9]/.test(pin);
-        
         if (hasNonNumeric) {
-            // Mixed pool with high letter distribution to ensure they appear
             return '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         }
-        
         return '0123456789';
     }
 
@@ -40,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function blendPin() {
         const pin = pinInput.value.trim();
         const position = parseInt(positionInput.value, 10);
+        const lag = parseInt(lagInput.value, 10) || 0;
         const addPrefix = prefixCheckbox.checked;
         const addUnsecureOffset = offsetCheckbox.checked;
 
@@ -48,18 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const noisePool = getNoisePool(pin);
         let blendedOutput = '';
 
+        // Add Initial Gear Lag
+        blendedOutput += generateRandomNoise(lag, noisePool);
+
+        // Add Offset-based PIN characters
         for (let i = 0; i < pin.length; i++) {
             blendedOutput += generateRandomNoise(position - 1, noisePool);
             blendedOutput += pin[i];
         }
 
+        // Add Trailing Noise
         const minTrailing = position * 2;
         const maxTrailing = position * 4;
         const trailingLength = Math.floor(Math.random() * (maxTrailing - minTrailing + 1)) + minTrailing;
         blendedOutput += generateRandomNoise(trailingLength, noisePool);
 
         if (addUnsecureOffset) {
-            blendedOutput = `${pin.length}@${position}x${blendedOutput}`;
+            blendedOutput = `${pin.length}@${position}:${lag}x${blendedOutput}`;
         } else if (addPrefix) {
             blendedOutput = `${pin.length}x${blendedOutput}`;
         }
@@ -72,41 +75,38 @@ document.addEventListener('DOMContentLoaded', () => {
     function extractPin() {
         const input = pinInput.value.trim();
         const currentOffset = parseInt(positionInput.value, 10);
+        const currentLag = parseInt(lagInput.value, 10) || 0;
         
         let pinLength = null;
-        let offset = null;
+        let offset = currentOffset;
+        let lag = currentLag;
         let stream = input;
 
-        // Pattern 1: N@MxStream (Unsecure)
-        const unsecureMatch = input.match(/^(\d+)@(\d+)x(.+)$/);
+        // Pattern 1: N@M:LxStream (Unsecure)
+        const unsecureMatch = input.match(/^(\d+)@(\d+):(\d+)x(.+)$/);
         // Pattern 2: NxStream (Prefix)
         const prefixMatch = input.match(/^(\d+)x(.+)$/);
 
         if (unsecureMatch) {
             pinLength = parseInt(unsecureMatch[1], 10);
             offset = parseInt(unsecureMatch[2], 10);
-            stream = unsecureMatch[3];
+            lag = parseInt(unsecureMatch[3], 10);
+            stream = unsecureMatch[4];
         } else if (prefixMatch) {
             pinLength = parseInt(prefixMatch[1], 10);
             offset = currentOffset;
+            lag = currentLag;
             stream = prefixMatch[2];
-        } else {
-            // Pattern 3: Raw Stream (Manual)
-            offset = currentOffset;
-            // Length is unknown, so we process until stream ends
         }
 
-        if (isNaN(offset) || offset < 1) {
+        if (isNaN(offset) || offset < 1 || isNaN(lag) || lag < 0) {
             showMalfunction();
             return;
         }
 
-        // Explicitly ensure pinInput is not readonly
-        pinInput.readOnly = false;
-
         let extracted = '';
         try {
-            let i = 0;
+            let i = lag; // Start after the lag
             let count = 0;
             while (i + offset - 1 < stream.length) {
                 if (pinLength !== null && count >= pinLength) break;
@@ -127,17 +127,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateButtonStates() {
         const pinValue = pinInput.value.trim();
         const positionValue = parseInt(positionInput.value, 10);
+        const lagValue = parseInt(lagInput.value, 10);
+        
         const isPositionValid = !isNaN(positionValue) && positionValue >= 1;
+        const isLagValid = !isNaN(lagValue) && lagValue >= 0;
         const isPinNotEmpty = pinValue !== '';
 
-        blendButton.disabled = !(isPinNotEmpty && isPositionValid);
-        const isSelfContained = /^(\d+)@(\d+)x/.test(pinValue) || /^(\d+)x/.test(pinValue);
-        deobfuscateButton.disabled = !isPinNotEmpty || (!isSelfContained && !isPositionValid);
+        blendButton.disabled = !(isPinNotEmpty && isPositionValid && isLagValid);
+        
+        const isSelfContained = /^(\d+)@(\d+):(\d+)x/.test(pinValue) || /^(\d+)x/.test(pinValue);
+        deobfuscateButton.disabled = !isPinNotEmpty || (!isSelfContained && (!isPositionValid || !isLagValid));
     }
 
     // UI Event Listeners
     pinInput.addEventListener('input', updateButtonStates);
     positionInput.addEventListener('input', updateButtonStates);
+    lagInput.addEventListener('input', updateButtonStates);
 
     blendButton.addEventListener('click', blendPin);
     deobfuscateButton.addEventListener('click', extractPin);
@@ -146,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function openDialog(dialog) {
         dialog.showModal();
         dialog.scrollTop = 0;
-        // Focus the heading to prevent scrolling to the bottom button
         const heading = dialog.querySelector('h2');
         if (heading) heading.focus();
     }
@@ -177,6 +181,5 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => copyButton.innerHTML = originalIcon, 2000);
     });
 
-    // Initial state
     updateButtonStates();
 });

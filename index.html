@@ -33,6 +33,11 @@
                     <input type="number" id="positionInput" value="4" min="1" max="20">
                 </div>
 
+                <div class="input-group">
+                    <label for="lagInput">Initial Gear Lag (ANOTHER KEY TO REMEMBER)</label>
+                    <input type="number" id="lagInput" value="0" min="0" max="100">
+                </div>
+
                 <div class="checkbox-group">
                     <input type="checkbox" id="prefixCheckbox">
                     <label for="prefixCheckbox">Add Length Prefix (e.g., 4x)</label>
@@ -74,29 +79,31 @@
                 <p>The <strong>PinBlender</strong> uses a precise clockwork offset to hide your secret code within a
                     stream of noise.</p>
 
-                <h3>1. The Position Offset</h3>
+                <h3>1. The Initial Gear Lag</h3>
+                <p>To thwart brute-force attempts, the mechanism can prepend a random sequence of noise called <strong>Initial Gear Lag</strong>. This shifts the entire sequence, making the starting point of your PIN unpredictable.</p>
+
+                <h3>2. The Position Offset</h3>
                 <p>Your PIN digits are placed at intervals defined by the <strong>Position Offset</strong>. For an
                     offset of <code>4</code>, the mechanism generates <code>3</code> random digits, followed by your
                     <code>1st</code> PIN digit, and so on.
                 </p>
 
-                <h3>2. Trailing Noise</h3>
-                <p>To mask the true length of your PIN, a random sequence of noise (between 2x and 4x the offset length)
-                    is appended at the very end.</p>
+                <h3>3. Trailing Noise</h3>
+                <p>To mask the true length of your PIN, a random sequence of noise is appended at the very end.</p>
 
-                <h3>3. Length Prefix</h3>
+                <h3>4. Length Prefix</h3>
                 <p>If engaged, a prefix like <code>4x</code> is added to remind you that your original PIN was 4 digits
                     long.</p>
 
-                <h3>4. Unsecure Offset Exposure</h3>
-                <p class="warning-text"><strong>WARNING:</strong> This feature exposes both the PIN length and the
-                    Position Offset directly in the output (e.g., <code>4@3x123...</code>). This significantly reduces
+                <h3>5. Unsecure Offset Exposure</h3>
+                <p class="warning-text"><strong>WARNING:</strong> This feature exposes the PIN length, the
+                    Position Offset, and the Gear Lag directly in the output (e.g., <code>4@3:5x...</code>). This significantly reduces
                     security and is strictly for mechanical testing only.</p>
 
-                <h3>5. Extracting the Essence</h3>
+                <h3>6. Extracting the Essence</h3>
                 <p>Provide an obfuscated sequence to retrieve the original PIN. If the sequence contains a prefix (like
-                    <code>4x</code> or <code>4@3x</code>), the mechanism will automatically calibrate. Otherwise, ensure
-                    the <strong>Position Offset</strong> matches the one used during obfuscation.
+                    <code>4x</code> or <code>4@3:5x</code>), the mechanism will automatically calibrate. Otherwise, ensure
+                    both <strong>Position Offset</strong> and <strong>Initial Gear Lag</strong> match the ones used during obfuscation.
                 </p>
 
                 <div class="example">
